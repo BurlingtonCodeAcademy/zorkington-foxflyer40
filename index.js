@@ -6,67 +6,154 @@ function ask(questionText) {
     readlineInterface.question(questionText, resolve);
   });
 };
-/**************Setup code************************************** */
-
-
-/******************Objects*********************** */
+/*********Setup code* class definitions / Player object / commands************************************* */
 
 class Room {
   constructor(name, desc, inventory) {
     this.name = name
     this.desc = desc
+    this.locked = false
     this.inventory = inventory || []
 
 
-// what you can do in a room goes here enter, exit etc..
+    // what you can do in a room goes here enter, exit etc..
 
-    this.changeRoom = () => {
-      return (this.name + '\n' + this.description)
-
-
-
+    this.readSign = (sign) => {
+      if (playerAction === read) {
+        console.log(`Welcome to Burlington Code Academy! 
+      Come on up to the third floor. 
+      If the door is locked, use the code 12345.)`)
+      }
 
     }
 
-  }
 
-
-
-    /****************State Machine */
-    let roomIn = {
-      'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
-      'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
-      'Hallway': { canChangeTo: ['Foyer', 'Kitchen', 'Classroom'] },
-      'Classroom': { canChangeto: ['Hallway'] },
-      'Kitchen': { canChangeto: ['Hallway'] },
-      'Muddies': { canChangeto: ['MainSt', 'MrMikes'] },
-      'MrMikes': { canChangeto: ['Muddies', 'MainSt'] },
-    }
-    let roomLookup = {
-      'MainSt': MainSt,
-      'Foyer': Foyer,
-      'Hallway': Hallway,
-      'Classroom': Classroom,
-      'Kitchen': Kitchen,
-      'Muddies': Muddies,
-      'MrMikes': MrMikes
+    this.room = (locked) => {
+      if (playerAction === unlock) {
+        this.room.locked = false
+      }
     }
   }
+}
+
+class Item {
+  constructor(name, description, takeable) {
+    this.name = name
+    this.description = description
+    this.takeable = takeable || false
+  }
+}
+
+// commands
+const commands = {
+  read: ['read', 'look at', 'view', 'decipher'],
+  exit: ['leave', 'go','exit'],
+  unlock: ['12345']
+
+  // affirmative: ['yes', 'yesh', 'yup', 'y', 'yeah', 'ok', ''],
+  // move: ['go', 'move', 'head', 'walk', 'run', 'crawl', 'skip', 'enter', 'continue'],
+  // examine: ['look', 'examine', 'check', 'study', 'inspect'],
+  // take: ['pick', 'take', 'grab', 'steal', 'buy'],
+  // use: ['use', 'give', 'eat', 'drink'],
+  // unlock: ['unlock', 'open'],
+  // immolate: ['immolate', 'ignite', 'light', 'burn'],
+  // drop: ['drop', 'remove']
+}
+
+
+/******************Objects*********************** */
+
+//Items
+const sevenDays = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
+const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
+
+
+
+//Rooms
+const MainSt = new Room('MainSt', 'There is a door here. A keypad sits on the handle. On the door is a handwritten sign.', ['keypad', 'sign']);
+MainSt.locked = true
+const Foyer = new Room('Foyer', 'You are inside the building.  Ahead of you is a stairway. On a table to your right is a newspaper.', ['SevenDays']);
+const Hallway = new Room('Hallway', 'You are in a hallway on the 3rd floor.  To your left is an alcove with a Kitchen. In front of you is a door with a window.  You can see tables and chairs through the window', []);
+const Classroom = new Room('Classroom', 'Bob is in the classroom drinking tea and waiting to lecture.'['Bob', 'laptop']);
+const Kitchen = new Room('Kitchen', 'Tea is brewing in the teapot,'['tea']);
+const Muddies = new Room('Muddies', 'Would you like to buy some coffee and a snack? It will make you code faster and with more energy.', ['coffee', 'snacks']);
+const MrMikes = new Room('MrMikes', 'Pizza on a Friday is great for networking,'['pizza']);
 
 
 
 
 
 
-    start();
+/****************State Machine */
+// let roomIn = {
+//   'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
+//   'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
+//   'Hallway': { canChangeTo: ['Foyer', 'Kitchen', 'Classroom'] },
+//   'Classroom': { canChangeto: ['Hallway'] },
+//   'Kitchen': { canChangeto: ['Hallway'] },
+//   'Muddies': { canChangeto: ['MainSt', 'MrMikes'] },
+//   'MrMikes': { canChangeto: ['Muddies', 'MainSt'] },
+// }
+// let roomLookup = {
+//   'MainSt': MainSt,
+//   'Foyer': Foyer,
+//   'Hallway': Hallway,
+//   'Classroom': Classroom,
+//   'Kitchen': Kitchen,
+//   'Muddies': Muddies,
+//   'MrMikes': MrMikes
+// }
 
-    async function start() {
-      const welcomeMessage = `182 Main St.
-You are standing on Main Street between Church and South Winooski.
+
+
+
+
+/********************* Game process******************************** */
+
+start();
+
+async function start() {
+  const instruction = `\nWelcome to a typical day at Burlington code Academy
+  Please answer questions as asked.
+  
+  You may let me know what you want to do by entering:
+  a verb and an item.
+  (ex. enter room, or take pizza)
+  
+  Are you ready to play? \n>_`
+
+  const welcomeMessage = `You are at 182 Main St, 
+standing between Church St. and South Winooski Ave.
+
 There is a door here. A keypad sits on the handle.
-On the door is a handwritten sign.`;
-      let answer = await ask(welcomeMessage);
+On the door is a handwritten sign.
+(press enter to continue)`;
 
-      console.log('\n"What do you want to do?"\n>_');
-      //process.exit();
-    }
+  let response = await ask(instruction);
+  if (response.toLowerCase().charAt(0) !== 'y') {
+    console.log('Try again.  I do not understand ' + response + '.')
+    start();
+  } else {
+    let answer = await ask(welcomeMessage);
+
+    play()
+    //process.exit();
+  }
+}
+
+async function play() {
+  let playerInput = await ask('What do you want to do?"\n>_')
+  let cleanInput = playerInput.toLowerCase()
+  let inputArray = cleanInput.split(' ');
+  let playerAction = inputArray[0];
+  console.log(playerAction)
+
+  //exit
+  if (commands.exit.includes(playerAction)) {
+  process.exit()
+  } else {
+    console.log(`Welcome to Burlington Code Academy!
+    Come on up to the third floor. If the door is locked,
+    use the code 12345.`)
+  }
+}
