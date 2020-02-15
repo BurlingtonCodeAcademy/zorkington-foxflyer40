@@ -8,31 +8,28 @@ function ask(questionText) {
 };
 /*********Setup code* class definitions / Player object / commands************************************* */
 
+const player = {
+  currentRoom: null,
+  isHungry: true,
+  inventory: [],
+
+
+}
+
 class Room {
   constructor(name, desc, inventory) {
     this.name = name
     this.desc = desc
     this.locked = false
     this.inventory = inventory || []
-
-
     // what you can do in a room goes here enter, exit etc..
-
-    this.readSign = (sign) => {
-      if (playerAction === read) {
-        console.log(`Welcome to Burlington Code Academy! 
-      Come on up to the third floor. 
-      If the door is locked, use the code 12345.)`)
-      }
-
-    }
-
 
     this.room = (locked) => {
       if (playerAction === unlock) {
         this.room.locked = false
       }
     }
+
   }
 }
 
@@ -41,25 +38,30 @@ class Item {
     this.name = name
     this.description = description
     this.takeable = takeable || false
+
+    this.examineItem = (item) => {
+      return (item.description),
+        play()
+    }
   }
 }
 
 // commands
 const commands = {
-  read: ['read', 'look at', 'view', 'decipher'],
-  exit: ['leave', 'go','exit'],
-  unlock: ['12345']
-
-  // affirmative: ['yes', 'yesh', 'yup', 'y', 'yeah', 'ok', ''],
-  // move: ['go', 'move', 'head', 'walk', 'run', 'crawl', 'skip', 'enter', 'continue'],
-  // examine: ['look', 'examine', 'check', 'study', 'inspect'],
-  // take: ['pick', 'take', 'grab', 'steal', 'buy'],
-  // use: ['use', 'give', 'eat', 'drink'],
-  // unlock: ['unlock', 'open'],
-  // immolate: ['immolate', 'ignite', 'light', 'burn'],
-  // drop: ['drop', 'remove']
+  read: ['read', 'look', 'view', 'decipher', 'examine'],
+  exit: ['leave', 'go', 'exit'],
+  unlock: ['unlock', 'open'],
+  take: ['pick', 'take', 'grab', 'steal', 'buy'],
+  drop: ['drop', 'remove'],
+  enter: ['enter', 'go', 'open'],
+  consume: ['eat', 'drink',]
 }
 
+function capitalize(word) {
+  let firstLetter = word[0];
+  let restOfWord = word.slice(1);
+  return firstLetter.toUpperCase() + restOfWord.toLowerCase();
+}
 
 /******************Objects*********************** */
 
@@ -85,26 +87,29 @@ const MrMikes = new Room('MrMikes', 'Pizza on a Friday is great for networking,'
 
 
 /****************State Machine */
-// let roomIn = {
-//   'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
-//   'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
-//   'Hallway': { canChangeTo: ['Foyer', 'Kitchen', 'Classroom'] },
-//   'Classroom': { canChangeto: ['Hallway'] },
-//   'Kitchen': { canChangeto: ['Hallway'] },
-//   'Muddies': { canChangeto: ['MainSt', 'MrMikes'] },
-//   'MrMikes': { canChangeto: ['Muddies', 'MainSt'] },
-// }
-// let roomLookup = {
-//   'MainSt': MainSt,
-//   'Foyer': Foyer,
-//   'Hallway': Hallway,
-//   'Classroom': Classroom,
-//   'Kitchen': Kitchen,
-//   'Muddies': Muddies,
-//   'MrMikes': MrMikes
-// }
+let roomIn = {
+  'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
+  'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
+  'Hallway': { canChangeTo: ['Foyer', 'Kitchen', 'Classroom'] },
+  'Classroom': { canChangeto: ['Hallway'] },
+  'Kitchen': { canChangeto: ['Hallway'] },
+  'Muddies': { canChangeto: ['MainSt', 'MrMikes'] },
+  'MrMikes': { canChangeto: ['Muddies', 'MainSt'] },
+}
+let roomLookup = {
+  'MainSt': MainSt,
+  'Foyer': Foyer,
+  'Hallway': Hallway,
+  'Classroom': Classroom,
+  'Kitchen': Kitchen,
+  'Muddies': Muddies,
+  'MrMikes': MrMikes
+}
 
-
+let itemsLookup = {
+  'sign': sign,
+  'sevendays': sevenDays
+}
 
 
 
@@ -120,7 +125,7 @@ async function start() {
   a verb and an item.
   (ex. enter room, or take pizza)
   
-  Are you ready to play? \n>_`
+  Are you ready to play?\n(Yes / No)>_`
 
   const welcomeMessage = `You are at 182 Main St, 
 standing between Church St. and South Winooski Ave.
@@ -134,6 +139,7 @@ On the door is a handwritten sign.
     console.log('Try again.  I do not understand ' + response + '.')
     start();
   } else {
+    player.currentRoom = MainSt
     let answer = await ask(welcomeMessage);
 
     play()
@@ -146,14 +152,34 @@ async function play() {
   let cleanInput = playerInput.toLowerCase()
   let inputArray = cleanInput.split(' ');
   let playerAction = inputArray[0];
-  console.log(playerAction)
+  let playerItem = inputArray[(inputArray.length - 1)]
+  let playerFunction = (playerAction + capitalize(playerItem))
 
-  //exit
+  console.log(playerAction)       // process check to be deleted when game works
+  console.log(playerItem)         // process check to be deleted when game works
+  console.log(playerFunction)     // process check to be deleted when game works
+  console.log(player.currentRoom.name)   // process check to be deleted when game works
+
+
   if (commands.exit.includes(playerAction)) {
-  process.exit()
-  } else {
-    console.log(`Welcome to Burlington Code Academy!
-    Come on up to the third floor. If the door is locked,
-    use the code 12345.`)
+    process.exit()
+  }
+
+  else if (commands.read.includes(playerAction)) {
+    let item = itemsLookup.playerItem
+    console.log(item)
+   // Item.examineItem(item)
+    console.log(item.description)
   }
 }
+
+
+
+//async function examine(item){
+
+    //if (player.inventory.includes(item)){
+
+        //console.log(item.description)
+
+    //} else console.log("\nYou don't have that item}
+
