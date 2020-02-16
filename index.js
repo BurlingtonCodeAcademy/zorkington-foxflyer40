@@ -6,14 +6,12 @@ function ask(questionText) {
     readlineInterface.question(questionText, resolve);
   });
 };
-/*********Setup code* class definitions / Player object / commands************************************* */
+/*Setup code  Player object / class definitions / commands / global functions*****/
 
 const player = {
   currentRoom: null,
   isHungry: true,
   inventory: [],
-
-
 }
 
 class Room {
@@ -22,14 +20,13 @@ class Room {
     this.desc = desc
     this.locked = false
     this.inventory = inventory || []
-    // what you can do in a room goes here enter, exit etc..
 
+    // room methods
     this.room = (locked) => {
       if (playerAction === unlock) {
         this.room.locked = false
       }
     }
-
   }
 }
 
@@ -39,17 +36,22 @@ class Item {
     this.description = description
     this.takeable = takeable || false
 
+    // Item methods
     this.examineItem = (item) => {
-      return (item.description),
-        play()
+      return (item.description)
     }
+
+    this.takeItem = (item) => {
+      return (item.takeable)
+    }
+
   }
 }
 
 // commands
 const commands = {
   read: ['read', 'look', 'view', 'decipher', 'examine'],
-  exit: ['leave', 'go', 'exit'],
+  exit: ['leave', 'go', 'exit', 'end'],
   unlock: ['unlock', 'open'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   drop: ['drop', 'remove'],
@@ -67,7 +69,7 @@ function capitalize(word) {
 
 //Items
 const sevenDays = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
-const sign = new Item('sign', '! Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
+const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
 
 
 
@@ -82,11 +84,7 @@ const Muddies = new Room('Muddies', 'Would you like to buy some coffee and a sna
 const MrMikes = new Room('MrMikes', 'Pizza on a Friday is great for networking,'['pizza']);
 
 
-
-
-
-
-/****************State Machine */
+//Sate Machine 
 let roomIn = {
   'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
   'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
@@ -96,6 +94,8 @@ let roomIn = {
   'Muddies': { canChangeto: ['MainSt', 'MrMikes'] },
   'MrMikes': { canChangeto: ['Muddies', 'MainSt'] },
 }
+
+//Lookups
 let roomLookup = {
   'MainSt': MainSt,
   'Foyer': Foyer,
@@ -141,7 +141,6 @@ On the door is a handwritten sign.
   } else {
     player.currentRoom = MainSt
     let answer = await ask(welcomeMessage);
-
     play()
     //process.exit();
   }
@@ -155,10 +154,10 @@ async function play() {
   let playerItem = inputArray[(inputArray.length - 1)]
   let playerFunction = (playerAction + capitalize(playerItem))
 
-  console.log(playerAction)       // process check to be deleted when game works
-  console.log(playerItem)         // process check to be deleted when game works
-  console.log(playerFunction)     // process check to be deleted when game works
-  console.log(player.currentRoom.name)   // process check to be deleted when game works
+  // console.log(playerAction)       // process check to be deleted when game works
+  // console.log(playerItem)         // process check to be deleted when game works
+  // console.log(playerFunction)     // process check to be deleted when game works
+  // console.log(player.currentRoom.name)   // process check to be deleted when game works
 
 
   if (commands.exit.includes(playerAction)) {
@@ -166,20 +165,24 @@ async function play() {
   }
 
   else if (commands.read.includes(playerAction)) {
-  let item = itemsLookup[playerItem]
-    //console.log(item)
-   // Item.examineItem(item)
+    let item = itemsLookup[playerItem]
     console.log(item.description)
+    play()
   }
+
+  else if (commands.take.includes(playerAction)) {
+    let item = itemsLookup[playerItem]
+    item.takeItem(item)
+    if (item.takeable === false) {
+      console.log('That would be selfish. How will other students find their way?')
+      play()
+    }
+  }
+
+
 }
 
 
 
-//async function examine(item){
 
-    //if (player.inventory.includes(item)){
-
-        //console.log(item.description)
-
-    //} else console.log("\nYou don't have that item}
 
