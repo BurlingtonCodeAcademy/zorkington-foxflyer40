@@ -51,11 +51,11 @@ class Item {
 // commands
 const commands = {
   read: ['read', 'look', 'view', 'decipher', 'examine'],
-  exit: ['leave', 'go', 'exit', 'end'],
-  unlock: ['unlock', 'open'],
+  exit: ['leave', 'exit', 'end'],
+  unlock: ['unlock', 'enter', 'key', 'punch'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   drop: ['drop', 'remove'],
-  enter: ['enter', 'go', 'open'],
+  enter: ['go', 'open','key'],
   consume: ['eat', 'drink',]
 }
 
@@ -76,7 +76,7 @@ const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to
 //Rooms
 const MainSt = new Room('MainSt', 'There is a door here. A keypad sits on the handle. On the door is a handwritten sign.', ['keypad', 'sign']);
 MainSt.locked = true
-const Foyer = new Room('Foyer', 'You are inside the building.  Ahead of you is a stairway. On a table to your right is a newspaper.', ['SevenDays']);
+const Foyer = new Room('Foyer', 'You are in the Foyer.  Ahead of you is a stairway. On a table to your right is a newspaper.', ['SevenDays']);
 const Hallway = new Room('Hallway', 'You are in a hallway on the 3rd floor.  To your left is an alcove with a Kitchen. In front of you is a door with a window.  You can see tables and chairs through the window', []);
 const Classroom = new Room('Classroom', 'Bob is in the classroom drinking tea and waiting to lecture.'['Bob', 'laptop']);
 const Kitchen = new Room('Kitchen', 'Tea is brewing in the teapot,'['tea']);
@@ -180,12 +180,15 @@ async function play() {
   }
 
 else if (commands.enter.includes(playerAction)) {
-//let room = (roomLookup[player.currentRoom])
-//console.log(player.currentRoom)
 if (player.currentRoom.locked === true) {
 console.log('The door is locked. There is a keypad on the door handle.')
    play()}
+}  
 
+else if (commands.unlock.includes(playerAction) && inputArray.includes('12345')) {
+  player.currentRoom.locked = false;
+  player.currentRoom = 'Foyer';
+  console.log('Success! The door opens. You enter the foyer and the door shuts behind you.')
 }
 
   
