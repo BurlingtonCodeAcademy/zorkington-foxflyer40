@@ -67,7 +67,7 @@ function capitalize(word) {
 
 //Items
 const sevenDays = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
-const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
+const sign = new Item('sign', '! Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
 
 
 
@@ -166,8 +166,8 @@ async function play() {
   }
 
   else if (commands.read.includes(playerAction)) {
-    let item = itemsLookup.playerItem
-    console.log(item)
+  let item = itemsLookup[playerItem]
+    //console.log(item)
    // Item.examineItem(item)
     console.log(item.description)
   }
