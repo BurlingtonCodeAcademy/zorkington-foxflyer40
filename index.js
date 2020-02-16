@@ -179,7 +179,16 @@ async function play() {
     }
   }
 
+else if (commands.enter.includes(playerAction)) {
+//let room = (roomLookup[player.currentRoom])
+//console.log(player.currentRoom)
+if (player.currentRoom.locked === true) {
+console.log('The door is locked. There is a keypad on the door handle.')
+   play()}
 
+}
+
+  
 }
 
 
