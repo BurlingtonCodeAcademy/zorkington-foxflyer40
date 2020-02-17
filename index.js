@@ -28,6 +28,9 @@ class Room {
       }
     }
 
+    this.see = (desc) => {
+      return (Room.desc)
+    }
 
   }
 }
@@ -54,7 +57,7 @@ class Item {
 const commands = {
   read: ['read', 'look', 'view', 'decipher', 'examine'],
   exit: ['leave', 'exit', 'end'],
-  unlock: ['unlock', 'enter', 'key', 'punch'],
+  unlock: ['unlock', 'enter', 'key', 'punch', 'press'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   drop: ['drop', 'remove'],
   enter: ['go', 'open', 'key'],
@@ -72,9 +75,11 @@ function enterRoom(roomTo) {
   let validTransitions = roomIn[roomNow].canChangeTo;
   if (validTransitions.includes(roomTo)) {
     player.currentRoom = roomTo
-    console.log('Success! The door opens. You enter the foyer and the door shuts behind you.\n')
-    console.log(player)
+    console.log('\nSuccess! The door opens. You enter the foyer and the door shuts behind you.\n')
     
+    // console.log(roomTo)
+    // console.log(player.currentRoom.desc)
+
   } else {
     console.log("Invalid state transition attempted - from " + roomNow + " to " + roomTo);
   }
@@ -86,10 +91,11 @@ function takeItem(item) {
     console.log("You already have " + item)
   } else {
     player.inventory.push(item)
+  
     console.log(player)
     let room = player.currentRoom
     room.inventory.pop(item)
-  console.log(Foyer)
+    console.log(Foyer)
   }
 
 };
@@ -157,6 +163,8 @@ async function start() {
   You may let me know what you want to do by entering:
   a verb and an item.
   (ex. enter room, or take pizza)
+
+  You can check what you have by entering 'i'
   
   Are you ready to play?\n(Yes / No)>_`
 
@@ -187,14 +195,16 @@ async function play() {
   let playerItem = inputArray[(inputArray.length - 1)]
   let playerFunction = (playerAction + capitalize(playerItem))
 
-  // console.log(playerAction)       // process check to be deleted when game works
-  // console.log(playerItem)         // process check to be deleted when game works
-  // console.log(playerFunction)     // process check to be deleted when game works
-  // console.log(player.currentRoom.name)   // process check to be deleted when game works
-
-
   if (commands.exit.includes(playerAction)) {
     process.exit()
+  }
+
+  else if (cleanInput ==='i') {
+    if (player.inventory === [null]) {
+      console.log('You do not have anything yet.')
+    } else
+    console.log('You are carrying ' + player.inventory)
+    play()
   }
 
   else if (commands.read.includes(playerAction)) {
@@ -219,25 +229,29 @@ async function play() {
     }
   }
 
-  else if (commands.unlock.includes(playerAction) && inputArray.includes('12345')) {
-    player.currentRoom.locked = false;
-    let newRoom = 'Foyer'
-    enterRoom(newRoom)
-    
-    
-    play()
+  else if (commands.unlock.includes(playerAction)) {
+    if (inputArray.includes('12345')) {
+      player.currentRoom.locked = false;
+      let newRoom = 'Foyer'
+      enterRoom(newRoom)
+      play()
+    } else {
+      console.log('Bzzzzt! The door is still locked.')
+      play()
+    }
   }
+  else if (commands.take.includes(playerAction) && (playerItem.slice - 4) === 'days') {
 
-  else if (commands.take.includes(playerAction) && playerItem === 'sevendays') {
     let item = playerItem
     takeItem(item)
+    console.log('You pick up the paper and leaf through it looking for comics and ignoring the articles, just like everybody else does.')
     play()
   }
   else {
     console.log(playerAction)       // process check to be deleted when game works
     console.log(playerItem)        // process check to be deleted when game works
     console.log(player.currentRoom.inventory)
-    
+
     play()
   }
 }
