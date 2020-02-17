@@ -27,6 +27,8 @@ class Room {
         this.room.locked = false
       }
     }
+
+
   }
 }
 
@@ -55,7 +57,7 @@ const commands = {
   unlock: ['unlock', 'enter', 'key', 'punch'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   drop: ['drop', 'remove'],
-  enter: ['go', 'open','key'],
+  enter: ['go', 'open', 'key'],
   consume: ['eat', 'drink',]
 }
 
@@ -65,10 +67,40 @@ function capitalize(word) {
   return firstLetter.toUpperCase() + restOfWord.toLowerCase();
 }
 
+function enterRoom(roomTo) {
+  let roomNow = player.currentRoom.name
+  let validTransitions = roomIn[roomNow].canChangeTo;
+  if (validTransitions.includes(roomTo)) {
+    player.currentRoom = roomTo
+    console.log('Success! The door opens. You enter the foyer and the door shuts behind you.\n')
+    console.log(player)
+    
+  } else {
+    console.log("Invalid state transition attempted - from " + roomNow + " to " + roomTo);
+  }
+}
+
+function takeItem(item) {
+
+  if (player.inventory.includes(item)) {
+    console.log("You already have " + item)
+  } else {
+    player.inventory.push(item)
+    console.log(player)
+    let room = player.currentRoom
+    room.inventory.pop(item)
+  console.log(Foyer)
+  }
+
+};
+
+
+
+
 /******************Objects*********************** */
 
 //Items
-const sevenDays = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
+const sevendays = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
 const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
 
 
@@ -76,7 +108,7 @@ const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to
 //Rooms
 const MainSt = new Room('MainSt', 'There is a door here. A keypad sits on the handle. On the door is a handwritten sign.', ['keypad', 'sign']);
 MainSt.locked = true
-const Foyer = new Room('Foyer', 'You are in the Foyer.  Ahead of you is a stairway. On a table to your right is a newspaper.', ['SevenDays']);
+const Foyer = new Room('Foyer', 'You are in the Foyer.  Ahead of you is a stairway. On a table to your right is a newspaper.', ['Sevendays']);
 const Hallway = new Room('Hallway', 'You are in a hallway on the 3rd floor.  To your left is an alcove with a Kitchen. In front of you is a door with a window.  You can see tables and chairs through the window', []);
 const Classroom = new Room('Classroom', 'Bob is in the classroom drinking tea and waiting to lecture.'['Bob', 'laptop']);
 const Kitchen = new Room('Kitchen', 'Tea is brewing in the teapot,'['tea']);
@@ -84,7 +116,7 @@ const Muddies = new Room('Muddies', 'Would you like to buy some coffee and a sna
 const MrMikes = new Room('MrMikes', 'Pizza on a Friday is great for networking,'['pizza']);
 
 
-//Sate Machine 
+//State Machine 
 let roomIn = {
   'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
   'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
@@ -108,7 +140,8 @@ let roomLookup = {
 
 let itemsLookup = {
   'sign': sign,
-  'sevendays': sevenDays
+  'sevenDays': sevendays
+
 }
 
 
@@ -170,7 +203,7 @@ async function play() {
     play()
   }
 
-  else if (commands.take.includes(playerAction)) {
+  else if (commands.take.includes(playerAction) && playerItem === 'sign') {
     let item = itemsLookup[playerItem]
     item.takeItem(item)
     if (item.takeable === false) {
@@ -179,22 +212,32 @@ async function play() {
     }
   }
 
-else if (commands.enter.includes(playerAction)) {
-if (player.currentRoom.locked === true) {
-console.log('The door is locked. There is a keypad on the door handle.')
-   play()}
-}  
+  else if (commands.enter.includes(playerAction)) {
+    if (player.currentRoom.locked === true) {
+      console.log('The door is locked. There is a keypad on the door handle.')
+      play()
+    }
+  }
 
-else if (commands.unlock.includes(playerAction) && inputArray.includes('12345')) {
-  player.currentRoom.locked = false;
-  player.currentRoom = 'Foyer';
-  console.log('Success! The door opens. You enter the foyer and the door shuts behind you.')
+  else if (commands.unlock.includes(playerAction) && inputArray.includes('12345')) {
+    player.currentRoom.locked = false;
+    let newRoom = 'Foyer'
+    enterRoom(newRoom)
+    
+    
+    play()
+  }
+
+  else if (commands.take.includes(playerAction) && playerItem === 'sevendays') {
+    let item = playerItem
+    takeItem(item)
+    play()
+  }
+  else {
+    console.log(playerAction)       // process check to be deleted when game works
+    console.log(playerItem)        // process check to be deleted when game works
+    console.log(player.currentRoom.inventory)
+    
+    play()
+  }
 }
-
-  
-}
-
-
-
-
-
