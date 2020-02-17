@@ -127,7 +127,7 @@ const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to
 //Rooms
 const MainSt = new Room('MainSt', 'There is a door here. A keypad sits on the handle. On the door is a handwritten sign.', ['keypad', 'sign']);
 MainSt.locked = true
-const Foyer = new Room('Foyer', 'You are in the Foyer.  Ahead of you is a stairway. On a table to your right is a 7Days newspaper.', ['Sevendays']);
+const Foyer = new Room('Foyer', 'You are in a foyer. Or maybe it\'s an antechamber. Or a vestibule. Or an entryway. Or an atrium. Or a narthex. But let\'s forget all that fancy flatlander vocabulary, and just call it a foyer. In Vermont, this is pronounced "FO-ee-yurr". A copy of Seven Days lies in a corner.', ['Sevendays']);
 const Hallway = new Room('Hallway', 'You are in a hallway on the 3rd floor.  To your left is an alcove with a Kitchen. In front of you is a door with a window.  You can see tables and chairs through the window', []);
 const Classroom = new Room('Classroom', 'Bob is in the classroom drinking tea and waiting to lecture.'['Bob', 'laptop']);
 const Kitchen = new Room('Kitchen', 'Tea is brewing in the teapot,'['tea']);
