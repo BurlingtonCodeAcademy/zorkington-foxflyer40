@@ -88,25 +88,19 @@ function enterRoom(roomTo) {
   if (validTransitions.includes(roomTo.name)) {
     player.currentRoom = roomTo
     console.log('\nSuccess! The door opens. You enter the foyer and the door shuts behind you.\n')
-    //see(roomTo)
-    // console.log(player)
     console.log(roomTo.desc)
-    // console.log(player.currentRoom.desc)
-
   } else {
     console.log("Invalid state transition attempted - from " + roomNow + " to " + roomTo);
   }
 }
 
 function takeItem(item) {
-
   if (player.inventory.includes(item)) {
     console.log("You already have " + item)
   } else {
     player.inventory.push(item)
     player.currentRoom.inventory.pop(item)
   }
-
 };
 
 function leaveItem(item) {
@@ -178,6 +172,8 @@ async function start() {
   (ex. enter room, or take pizza)
 
   You can check what you have by entering 'i'
+
+  When you are done enter 'exit'.
   
   Are you ready to play?\n(Yes / No)>_`
 
@@ -208,12 +204,13 @@ async function play() {
   let playerItem = inputArray[(inputArray.length - 1)]
   let playerFunction = (playerAction + capitalize(playerItem))
 
+  // end game
   if (commands.exit.includes(playerAction)) {
     process.exit()
   }
 
+  //check player inventory
   else if (cleanInput === 'i') {
-
     if (player.inventory.length === 0) {
       console.log('You do not have anything yet.')
       play()
@@ -223,12 +220,14 @@ async function play() {
     }
   }
 
+  //read item **story added
   else if (commands.read.includes(playerAction)) {
     let item = itemsLookup[playerItem]
     console.log(item.description)
     play()
   }
 
+  //cannot take untakeable sign
   else if (commands.take.includes(playerAction) && playerItem === 'sign') {
     let item = itemsLookup[playerItem]
     item.takeItem(item)
@@ -238,6 +237,7 @@ async function play() {
     }
   }
 
+  //cannot enter locked room
   else if (commands.enter.includes(playerAction)) {
     if (player.currentRoom.locked === true) {
       console.log('The door is locked. There is a keypad on the door handle.')
@@ -245,6 +245,7 @@ async function play() {
     }
   }
 
+  //unlock door... or not
   else if (commands.unlock.includes(playerAction)) {
     if (inputArray.includes('12345')) {
       player.currentRoom.locked = false;
@@ -258,6 +259,7 @@ async function play() {
     }
   }
 
+  //drop item
   else if (commands.drop.includes(playerAction) && (things.paper.includes(playerItem))) {
     let item = playerItem
     leaveItem(item)
@@ -265,7 +267,7 @@ async function play() {
     play()
   }
 
-
+  //take item
   else if (commands.take.includes(playerAction) && (things.paper.includes(playerItem))) {
     let item = playerItem
     takeItem(item)
@@ -273,12 +275,9 @@ async function play() {
     play()
   }
 
+  //default for bad input
   else {
     console.log('Sorry, I don\'t know how to ' + playerAction + ' .')
-    console.log(playerAction)       // process check to be deleted when game works
-    console.log(playerItem)        // process check to be deleted when game works
-    console.log(player.currentRoom.inventory)
-
     play()
   }
 }
