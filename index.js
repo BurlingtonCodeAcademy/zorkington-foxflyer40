@@ -76,7 +76,8 @@ function enterRoom(roomTo) {
   if (validTransitions.includes(roomTo)) {
     player.currentRoom = roomTo
     console.log('\nSuccess! The door opens. You enter the foyer and the door shuts behind you.\n')
-    
+    //see(roomTo)
+    console.log(player)
     // console.log(roomTo)
     // console.log(player.currentRoom.desc)
 
