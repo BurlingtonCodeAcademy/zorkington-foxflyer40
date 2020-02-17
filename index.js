@@ -12,6 +12,13 @@ const player = {
   currentRoom: null,
   isHungry: true,
   inventory: [],
+
+  showInventory: function () {
+    console.log('You are carrying:')
+    this.inventory.forEach((item) => {
+      console.log(item)
+    })
+  }
 }
 
 class Room {
@@ -22,14 +29,14 @@ class Room {
     this.inventory = inventory || []
 
     // room methods
-    this.room = (locked) => {
+    this.room = () => {
       if (playerAction === unlock) {
         this.room.locked = false
       }
     }
 
-    this.see = (desc) => {
-      return (Room.desc)
+    this.see = () => {
+      return (this.desc)
     }
 
   }
@@ -43,11 +50,11 @@ class Item {
 
     // Item methods
     this.examineItem = (item) => {
-      return (item.description)
+      return (this.description)
     }
 
     this.takeItem = (item) => {
-      return (item.takeable)
+      return (this.takeable)
     }
 
   }
@@ -56,12 +63,17 @@ class Item {
 // commands
 const commands = {
   read: ['read', 'look', 'view', 'decipher', 'examine'],
-  exit: ['leave', 'exit', 'end'],
+  exit: ['exit', 'end'],
   unlock: ['unlock', 'enter', 'key', 'punch', 'press'],
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
-  drop: ['drop', 'remove'],
+  drop: ['drop', 'remove', 'leave'],
   enter: ['go', 'open', 'key'],
   consume: ['eat', 'drink',]
+}
+
+// Items
+const things = {
+  paper: ['sevendays', '7Days', 'days', 'newspaper', 'paper']
 }
 
 function capitalize(word) {
@@ -73,12 +85,12 @@ function capitalize(word) {
 function enterRoom(roomTo) {
   let roomNow = player.currentRoom.name
   let validTransitions = roomIn[roomNow].canChangeTo;
-  if (validTransitions.includes(roomTo)) {
+  if (validTransitions.includes(roomTo.name)) {
     player.currentRoom = roomTo
     console.log('\nSuccess! The door opens. You enter the foyer and the door shuts behind you.\n')
     //see(roomTo)
-    console.log(player)
-    // console.log(roomTo)
+    // console.log(player)
+    console.log(roomTo.desc)
     // console.log(player.currentRoom.desc)
 
   } else {
@@ -92,22 +104,22 @@ function takeItem(item) {
     console.log("You already have " + item)
   } else {
     player.inventory.push(item)
-
-    console.log(player)
-    let room = player.currentRoom
-    room.inventory.pop(item)
-    console.log(Foyer)
+    player.currentRoom.inventory.pop(item)
   }
 
 };
 
+function leaveItem(item) {
+  player.currentRoom.inventory.push(item)
+  player.inventory.pop(item)
+}
 
 
 
 /******************Objects*********************** */
 
 //Items
-const sevendays = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
+const paper = new Item('7 Days', 'It is a 7 Days newspaper, rumpled and torn, from August 2014', true);
 const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to the third floor. If the door is locked, use the code 12345.')
 
 
@@ -115,7 +127,7 @@ const sign = new Item('sign', 'Welcome to Burlington Code Academy! Come on up to
 //Rooms
 const MainSt = new Room('MainSt', 'There is a door here. A keypad sits on the handle. On the door is a handwritten sign.', ['keypad', 'sign']);
 MainSt.locked = true
-const Foyer = new Room('Foyer', 'You are in the Foyer.  Ahead of you is a stairway. On a table to your right is a newspaper.', ['Sevendays']);
+const Foyer = new Room('Foyer', 'You are in the Foyer.  Ahead of you is a stairway. On a table to your right is a 7Days newspaper.', ['Sevendays']);
 const Hallway = new Room('Hallway', 'You are in a hallway on the 3rd floor.  To your left is an alcove with a Kitchen. In front of you is a door with a window.  You can see tables and chairs through the window', []);
 const Classroom = new Room('Classroom', 'Bob is in the classroom drinking tea and waiting to lecture.'['Bob', 'laptop']);
 const Kitchen = new Room('Kitchen', 'Tea is brewing in the teapot,'['tea']);
@@ -147,7 +159,7 @@ let roomLookup = {
 
 let itemsLookup = {
   'sign': sign,
-  'sevenDays': sevendays
+  'paper': paper
 
 }
 
@@ -189,7 +201,7 @@ On the door is a handwritten sign.
 }
 
 async function play() {
-  let playerInput = await ask('What do you want to do?"\n>_')
+  let playerInput = await ask('\nWhat do you want to do?"\n>_')
   let cleanInput = playerInput.toLowerCase()
   let inputArray = cleanInput.split(' ');
   let playerAction = inputArray[0];
@@ -201,12 +213,12 @@ async function play() {
   }
 
   else if (cleanInput === 'i') {
-    let carrying = player.inventory.tostring()
-    console.log(carrying)
-    if (carrying === '') {
+
+    if (player.inventory.length === 0) {
       console.log('You do not have anything yet.')
+      play()
     } else {
-      console.log('You are carrying ' + carrying)
+      player.showInventory()
       play()
     }
   }
@@ -236,22 +248,33 @@ async function play() {
   else if (commands.unlock.includes(playerAction)) {
     if (inputArray.includes('12345')) {
       player.currentRoom.locked = false;
-      let newRoom = 'Foyer'
+      let newRoom = roomLookup['Foyer']
       enterRoom(newRoom)
+      console.log()
       play()
     } else {
       console.log('Bzzzzt! The door is still locked.')
       play()
     }
   }
-  else if (commands.take.includes(playerAction) && (playerItem.slice - 4) === 'days') {
 
+  else if (commands.drop.includes(playerAction) && (things.paper.includes(playerItem))) {
+    let item = playerItem
+    leaveItem(item)
+    console.log('You are leaving the ' + playerItem + ' in the ' + player.currentRoom.name)
+    play()
+  }
+
+
+  else if (commands.take.includes(playerAction) && (things.paper.includes(playerItem))) {
     let item = playerItem
     takeItem(item)
     console.log('You pick up the paper and leaf through it looking for comics and ignoring the articles, just like everybody else does.')
     play()
   }
+
   else {
+    console.log('Sorry, I don\'t know how to ' + playerAction + ' .')
     console.log(playerAction)       // process check to be deleted when game works
     console.log(playerItem)        // process check to be deleted when game works
     console.log(player.currentRoom.inventory)
