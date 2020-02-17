@@ -92,7 +92,7 @@ function takeItem(item) {
     console.log("You already have " + item)
   } else {
     player.inventory.push(item)
-  
+
     console.log(player)
     let room = player.currentRoom
     room.inventory.pop(item)
@@ -200,12 +200,15 @@ async function play() {
     process.exit()
   }
 
-  else if (cleanInput ==='i') {
-    if (player.inventory === [null]) {
+  else if (cleanInput === 'i') {
+    let carrying = player.inventory.tostring()
+    console.log(carrying)
+    if (carrying === '') {
       console.log('You do not have anything yet.')
-    } else
-    console.log('You are carrying ' + player.inventory)
-    play()
+    } else {
+      console.log('You are carrying ' + carrying)
+      play()
+    }
   }
 
   else if (commands.read.includes(playerAction)) {
