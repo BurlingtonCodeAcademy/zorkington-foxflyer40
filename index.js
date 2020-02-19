@@ -1,3 +1,8 @@
+/** Overall, nice looking code. Think about either using semicolons at the end of all of your statements, or not using them at all (link some pages on this)
+ *  Good use of objects throughout your code. Make sure you remember to remove unnecessary files/directories out of your repo for better organization. You can
+ *  also add a whole directory to your .gitignore if you know that the directory is not going to be a part of your code. (link to .gitignore article). You have
+ *  completed all of the stories and created some extra rooms. Once you get into the foyer, you are pretty much stuck. Looks like you have a really good start
+ *  to the zorkington game! If you want to take this further, try to implement functionality for some of the other rooms. God job, keep up the good work. **/
 const readline = require('readline');
 const readlineInterface = readline.createInterface(process.stdin, process.stdout);
 
@@ -22,6 +27,8 @@ const player = {
 }
 
 class Room {
+  /** If you add a locked parameter to your constructor, then you can pass true to rooms that should be locked and leave it blank for rooms that
+   *  should not be locked, then on line 123, you don't need to explicitly set MainSt room to locked **/
   constructor(name, desc, inventory) {
     this.name = name
     this.desc = desc
@@ -64,7 +71,7 @@ class Item {
 const commands = {
   read: ['read', 'look', 'view', 'decipher', 'examine'],
   exit: ['exit', 'end'],
-  unlock: ['unlock', 'enter', 'key', 'punch', 'press'],
+  unlock: ['unlock', 'enter', 'key', 'punch', 'press'], /** maybe the enter value should be associated with the enter key **/
   take: ['pick', 'take', 'grab', 'steal', 'buy'],
   drop: ['drop', 'remove', 'leave'],
   enter: ['go', 'open', 'key'],
@@ -107,6 +114,9 @@ function leaveItem(item) {
   player.currentRoom.inventory.push(item)
   player.inventory.pop(item)
 }
+/** Good use of helper functions. Since these functions just deal with the player object, you can move these into the player object and use this.currentRoom
+ *  and this.inventory, then you just call the functions through the player object. You could also create a player class and then create an instance of a
+ *  player when you start the game. **/
 
 
 
@@ -129,7 +139,7 @@ const Muddies = new Room('Muddies', 'Would you like to buy some coffee and a sna
 const MrMikes = new Room('MrMikes', 'Pizza on a Friday is great for networking,'['pizza']);
 
 
-//State Machine 
+//State Machine
 let roomIn = {
   'MainSt': { canChangeTo: ['Foyer', 'MrMikes', 'Muddies'] },
   'Foyer': { canChangeTo: ['MainSt', 'Hallway',] },
@@ -160,13 +170,13 @@ let itemsLookup = {
 
 
 /********************* Game process******************************** */
-
+/** Good use of comments throughout your code to separate out sections of code and describe what it happening in certain parts of code **/
 start();
 
 async function start() {
   const instruction = `\nWelcome to a typical day at Burlington code Academy
   Please answer questions as asked.
-  
+
   You may let me know what you want to do by entering:
   a verb and an item.
   (ex. enter room, or take pizza)
@@ -174,10 +184,10 @@ async function start() {
   You can check what you have by entering 'i'
 
   When you are done enter 'exit'.
-  
+
   Are you ready to play?\n(Yes / No)>_`
 
-  const welcomeMessage = `You are at 182 Main St, 
+  const welcomeMessage = `You are at 182 Main St,
 standing between Church St. and South Winooski Ave.
 
 There is a door here. A keypad sits on the handle.
@@ -186,6 +196,7 @@ On the door is a handwritten sign.
 
   let response = await ask(instruction);
   if (response.toLowerCase().charAt(0) !== 'y') {
+    /** Maybe if the user enters n or no, you can log a message and quit the game **/
     console.log('Try again.  I do not understand ' + response + '.')
     start();
   } else {
@@ -202,6 +213,7 @@ async function play() {
   let inputArray = cleanInput.split(' ');
   let playerAction = inputArray[0];
   let playerItem = inputArray[(inputArray.length - 1)]
+  /** This doesn't look like it's used anywhere in the code currently, maybe you forgot to remove it? **/
   let playerFunction = (playerAction + capitalize(playerItem))
 
   // end game
@@ -213,7 +225,7 @@ async function play() {
   else if (cleanInput === 'i') {
     if (player.inventory.length === 0) {
       console.log('You do not have anything yet.')
-      play()
+      play()  /** Good use of recursion to restart your play function after an action **/
     } else {
       player.showInventory()
       play()
@@ -243,6 +255,7 @@ async function play() {
       console.log('The door is locked. There is a keypad on the door handle.')
       play()
     }
+    /** else you should enter the room!! **/
   }
 
   //unlock door... or not
